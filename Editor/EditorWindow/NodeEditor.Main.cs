@@ -54,7 +54,7 @@ namespace SugarNode.Editor
             DrawGrid();//绘制网格
             DrawNodeGraph();//绘制节点图
             DrawDragRect();//绘制选择框
-            //DrawDebugInfo();//开发过程Debug专用
+            if(debugMode) DrawDebugInfo();//开发过程Debug专用
         }
         void OnEnable()
         {

@@ -7,6 +7,7 @@ namespace SugarNode.Editor
     {
         const float PPI = 0.001f;//其实是每单位像素对应UV坐标的多少单位\
         const int TitleHeight = 20;
+        bool debugMode = false;
         Rect drawGridRect => new Rect(Vector2.zero, position.size);
         Rect drawGridUV = Rect.zero;
         Rect contentRect => new Rect(0, TitleHeight, position.width, position.height);//Window坐标系下，去掉窗口的标题Title，纯内容的Rect
@@ -43,7 +44,7 @@ namespace SugarNode.Editor
                     menu.AddItem(new GUIContent($"创建新的{ClassType.Name}"), false, () =>
                     {
                         Debug.Log("敬请期待");
-                        //TODO:创建新的对话图等玩意儿在这里，重点是需要打开文件管理器的UI
+                        //TODO:创建新的对话图等玩意儿在这里，重点是需要打开文件管理器的UI（或者直接不要这个功能，删了这个else）
                     });
                 }
             }
@@ -56,23 +57,22 @@ namespace SugarNode.Editor
                     foreach (var childClass in childClasses)//对于每个具体能实例化的类
                     {
                         if (childClass.GetCustomAttribute(typeof(CreateMenuAttribute)) is CreateMenuAttribute createMenu)//有这个Attribute，就创建在用户的自定义路径
-                            menu.AddItem(new GUIContent(createMenu.menuPath), 
+                            menu.AddItem(new GUIContent(createMenu.menuPath),
                             false,
                             () => AddNodeToActiveGraph(childClass, TranslateWindowToGrid(mousePosition)));
                         else
-                            menu.AddItem(new GUIContent(childClass.Name), 
-                            false, 
+                            menu.AddItem(new GUIContent(childClass.Name),
+                            false,
                             () => AddNodeToActiveGraph(childClass, TranslateWindowToGrid(mousePosition)));
                     }
                 }
             }
-            menu.AddItem(new GUIContent($"复位移动"), false, () => PositionOffset = Vector2.zero);
-            menu.AddItem(new GUIContent($"复位缩放"), false, () => ScaleOffset = 1);
-            menu.AddItem(new GUIContent($"全部复位"), false, () =>
+            menu.AddItem(new GUIContent($"复位移动和缩放"), false, () =>
             {
                 PositionOffset = Vector2.zero;
-                ScaleOffset = 1;
+                ScaleOffset = 5;
             });
+            menu.AddItem(new GUIContent(debugMode ? "退出Debug模式" : "进入Debug模式"), false, () => debugMode = !debugMode);
             menu.ShowAsContext();
         }
         //绘制节点图

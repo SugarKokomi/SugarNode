@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEditor;
-using static SugarNode.Editor.NodeEditorSettings;
-using System;
+using System.Reflection;
 namespace SugarNode.Editor
 {
     partial class NodeEditorWindow
@@ -50,15 +49,26 @@ namespace SugarNode.Editor
             }
             else//否则在激活的节点图上创建节点
             {
-                var allowType = NodeGraph.GetAllowNodeTypeCache(activeGraph.GetType());
-                foreach (var ClassType in allowType)
-                {//TODO:ClassType.Name得换成命名空间+类名，以及用户自定义路径的Attribute
-                    menu.AddItem(new GUIContent(ClassType.Name), false, () => AddNodeToActiveGraph(ClassType, TranslateWindowToGrid(mousePosition)));
+                var allowBaseType = NodeGraph.GetAllowNodeTypeCache(activeGraph.GetType());//这里返回的是允许的所有基类Node（因为OnlyAllowNode可以不止写一个）
+                foreach (var parentClass in allowBaseType)//对于每个NodeGraph允许的基类
+                {
+                    var childClasses = GetSubclasses(parentClass);
+                    foreach (var childClass in childClasses)//对于每个具体能实例化的类
+                    {
+                        if (childClass.GetCustomAttribute(typeof(CreateMenuAttribute)) is CreateMenuAttribute createMenu)//有这个Attribute，就创建在用户的自定义路径
+                            menu.AddItem(new GUIContent(createMenu.menuPath), 
+                            false,
+                            () => AddNodeToActiveGraph(childClass, TranslateWindowToGrid(mousePosition)));
+                        else
+                            menu.AddItem(new GUIContent(childClass.Name), 
+                            false, 
+                            () => AddNodeToActiveGraph(childClass, TranslateWindowToGrid(mousePosition)));
+                    }
                 }
             }
             menu.AddItem(new GUIContent($"复位移动"), false, () => PositionOffset = Vector2.zero);
             menu.AddItem(new GUIContent($"复位缩放"), false, () => ScaleOffset = 1);
-            menu.AddItem(new GUIContent($"全部复位"), true, () =>
+            menu.AddItem(new GUIContent($"全部复位"), false, () =>
             {
                 PositionOffset = Vector2.zero;
                 ScaleOffset = 1;
@@ -73,7 +83,7 @@ namespace SugarNode.Editor
             {
                 GUI.EndClip();//取消原本GUI的裁剪（缩放后绘制Rect不再和窗口适配了）
                 Matrix4x4 originalMatrix = GUI.matrix;
-                GUIUtility.ScaleAroundPivot(new Vector2(1 / ScaleOffset, 1 / ScaleOffset), PositionOffset);//基于用户鼠标滚轮调整的缩放画UI
+                GUIUtility.ScaleAroundPivot(new Vector2(1 / ScaleOffset, 1 / ScaleOffset), PositionOffset);//基于用户鼠标滚轮拖动过的网格坐标原点缩放画UI
                 // 计算缩放后的内容Rect坐标
                 Matrix4x4 invert = Matrix4x4.Inverse(GUI.matrix);
                 Vector2 scaledContentRectMin = invert.MultiplyPoint(contentRect.position);
@@ -100,13 +110,13 @@ namespace SugarNode.Editor
         void DrawNode(Node node)
         {
             //获取节点的Attribute缓存信息，在绘制本节点的时候应用上
-            NodeWidthAttribute widthAttri = node.GetAttributeCache<NodeWidthAttribute>();
+            uint nodeWidth = node.GetNodeWidth();
             NodeColorAttribute colorAttri = node.GetAttributeCache<NodeColorAttribute>();
             //转换空间坐标
             Vector2 windowPos = TranslateGridToWindow(node.position);
             windowPos = TranslateWindowToGUI(windowPos);
             //绘制节点
-            Rect scaleWindowRect = new Rect(windowPos, new Vector2(widthAttri?.width ?? 1000, 500));
+            Rect scaleWindowRect = new Rect(windowPos, new Vector2(nodeWidth, 500));
             GUILayout.BeginArea(scaleWindowRect);//这个玩意儿不需要加这个括号->  {},仅仅是方便查看
             {
                 if (colorAttri != null)
@@ -132,7 +142,7 @@ namespace SugarNode.Editor
                 GUI.color = Color.white;
                 GUILayout.Label($"鼠标位置：{mousePosition}");
                 GUILayout.Label($"鼠标所在网格位置：{TranslateWindowToGrid(mousePosition)}");
-                GUILayout.Label($"鼠标距离网格中心的偏移位置：{PositionOffset - mousePosition*ScaleOffset}");
+                GUILayout.Label($"鼠标距离网格中心的偏移位置：{PositionOffset - mousePosition * ScaleOffset}");
                 GUILayout.Label($"网格偏移：{PositionOffset}");
                 GUILayout.Label($"网格缩放：{ScaleOffset}");
             }

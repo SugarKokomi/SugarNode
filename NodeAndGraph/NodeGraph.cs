@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using UnityEngine;
 namespace SugarNode
 {
@@ -32,8 +33,8 @@ namespace SugarNode
                 var cache = GetAllowNodeTypeCache(this.GetType());
                 if (cache == null) return true;
                 else foreach (var type in cache)
-                    if (nodeType.IsSubclassOf(type) || nodeType.Equals(type))
-                        return true;
+                        if (nodeType.IsSubclassOf(type) || nodeType.Equals(type))
+                            return true;
                 return false;
             }
             else return false;
@@ -46,7 +47,7 @@ namespace SugarNode
                 return value;
             else
             {
-                OnlyAllowNodeAttribute[] attributes = type.GetCustomAttributes(typeof(OnlyAllowNodeAttribute),true) as OnlyAllowNodeAttribute[];
+                OnlyAllowNodeAttribute[] attributes = type.GetCustomAttributes(typeof(OnlyAllowNodeAttribute), true) as OnlyAllowNodeAttribute[];
                 if (attributes != null && attributes.Length > 0)//如果写了[OnlyAllowNode]
                 {
                     var output = new HashSet<Type>();

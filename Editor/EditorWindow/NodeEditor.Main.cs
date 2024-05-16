@@ -28,7 +28,7 @@ namespace SugarNode.Editor
             get => m_positionOffset;
             set => m_positionOffset = value;
         }
-        private float m_scaleOffset = 1f;
+        private float m_scaleOffset = 5f;
         /// <summary> 网格缩放系数 </summary>
         public float ScaleOffset
         {
@@ -54,7 +54,7 @@ namespace SugarNode.Editor
             DrawGrid();//绘制网格
             DrawNodeGraph();//绘制节点图
             DrawDragRect();//绘制选择框
-            DrawDebugInfo();//开发过程Debug专用
+            //DrawDebugInfo();//开发过程Debug专用
         }
         void OnEnable()
         {

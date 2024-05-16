@@ -39,10 +39,9 @@ namespace SugarNode.Editor
             {
                 if (control.keyCode == KeyCode.F && control.type == EventType.KeyDown)
                 {
-                    /* if (activeGraph && activeGraph.nodes.Count >= 1)//TODO:看向选择的节点
-                        LookAtPoint(TranslateGridToWindow(activeGraph.nodes[0].position));
-                    else LookAtPoint(Vector2.zero); */
-                    LookAtPoint(Vector2.zero);
+                    if (activeGraph && activeGraph.nodes.Count >= 1)//TODO:看向选择的节点
+                        LookAtNode(activeGraph.nodes[0]);
+                    else LookAtPoint(Vector2.zero);
                     control.Use();
                 }
                 else if (control.keyCode == KeyCode.Delete)
@@ -51,15 +50,20 @@ namespace SugarNode.Editor
                 }
             }
         }
-        /// <summary>
-        /// 在网格坐标系中，看向某个位置
-        /// </summary>
-        /// <param name="pos"></param>
+        /// <summary> 在网格坐标系中，看向某个位置 </summary>
         private void LookAtPoint(Vector2 pos)
         {
-            //ScaleOffset = 5;
-            var windowPos = TranslateGridToWindow(pos);
-            PositionOffset = windowPos;// + position.size / 2;
+            var windowPos = TranslateGridToWindow(pos);//转换到窗口空间
+            windowPos = position.size / 2 - windowPos;//得到窗口空间下，目标点指向窗口中心的向量
+            PositionOffset += windowPos * ScaleOffset;//将缩放后的偏移向量加在坐标偏移向量里
+        }
+        /// <summary> 看向一个Node </summary>
+        private void LookAtNode(Node node)
+        {
+            uint x_offset_GUI = node.GetNodeWidth();//GUI坐标系中的宽度
+            float x_offset = PPI * x_offset_GUI / 2;//网格坐标系中，偏移节点宽度的一半（高度姑且先偏移网格的0.5格）
+            Vector2 offsetPoint = node.position + new Vector2(x_offset, 0.5f);
+            LookAtPoint(offsetPoint);
         }
         private void OnSelectionChanged()
         {

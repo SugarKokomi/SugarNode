@@ -61,12 +61,14 @@ namespace SugarNode.Editor
             }
             public void SetNodeBodyColorOffset(Color color)
             {
-                var source = nodeBody.normal.background;
+                return;
+
+                /* var source = nodeBody.normal.background;
                 for (int y = 0; y < source.height; y++)
                 {
                     for (int x = 0; x < source.width; x++)
                     {
-                        // 获取当前像素的颜色
+                        // 获取当前像素的颜色FIXME:报错：这张Texture的可读性false，因此无法改变颜色
                         Color pixelColor = source.GetPixel(x, y);
 
                         // 将每个颜色通道与所需的颜色相乘
@@ -76,7 +78,7 @@ namespace SugarNode.Editor
                         source.SetPixel(x, y, pixelColor);
                     }
                 }
-                source.Apply();
+                source.Apply(); */
             }
         }
     }

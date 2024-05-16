@@ -77,6 +77,11 @@ namespace SugarNode
                 return newAttribute2 as T;
             }
         }
+        internal uint GetNodeWidth()
+        {
+            var attribute = GetAttributeCache<NodeWidthAttribute>();
+            return attribute?.width ?? 1000;
+        }
 #endif
         #endregion
     }

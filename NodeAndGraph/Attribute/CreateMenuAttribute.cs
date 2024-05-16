@@ -1,7 +1,7 @@
 using System;
 namespace SugarNode
 {
-    [AttributeUsage(AttributeTargets.Class, Inherited = true, AllowMultiple = false)]
+    [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
     public sealed class CreateMenuAttribute : Attribute
     {
         public string menuPath;

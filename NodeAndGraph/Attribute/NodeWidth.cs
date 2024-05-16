@@ -4,8 +4,8 @@ namespace SugarNode
     [AttributeUsage(AttributeTargets.Class, Inherited = true, AllowMultiple = false)]
     public sealed class NodeWidthAttribute : Attribute
     {
-        public int width;
-        public NodeWidthAttribute(int width)
+        public uint width;
+        public NodeWidthAttribute(uint width)
         {
             this.width = width;
         }

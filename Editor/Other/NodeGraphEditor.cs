@@ -12,6 +12,7 @@ namespace SugarNode.Editor
                 NodeEditorWindow.OpenWindow();
                 NodeEditorWindow.activeGraph = (NodeGraph)target;
             }
+            GUILayout.Label("不建议在此对Nodes进行增减操作，\n会丢失内部的Node资源引用。\n需要增减请打开NodeEditor进行操作。");
             base.OnInspectorGUI();
         }
     }

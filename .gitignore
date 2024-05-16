@@ -74,4 +74,4 @@ crashlytics-build.properties
 # User custom files
 *.meta
 /.gitignore
-/.gitignore
+*.asset

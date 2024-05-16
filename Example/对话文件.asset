@@ -1,0 +1,71 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-4078784984658378969
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4d37341f13a5894db51e4712a589fc6, type: 3}
+  m_Name: NormalNode
+  m_EditorClassIdentifier: 
+  position: {x: 0, y: 0}
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e4b4d4446a9b05144bfc752a25a203f2, type: 3}
+  m_Name: "\u5BF9\u8BDD\u6587\u4EF6"
+  m_EditorClassIdentifier: 
+  nodes:
+  - {fileID: -4078784984658378969}
+  - {fileID: 5367881501141911653}
+  - {fileID: 5629972022994180804}
+  - {fileID: 6952589249309316398}
+--- !u!114 &5367881501141911653
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4d37341f13a5894db51e4712a589fc6, type: 3}
+  m_Name: NormalNode
+  m_EditorClassIdentifier: 
+  position: {x: 0.9996996, y: 0.48}
+--- !u!114 &5629972022994180804
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e938d86c2cb03fb438c852ca85e58cfa, type: 3}
+  m_Name: BranchNode
+  m_EditorClassIdentifier: 
+  position: {x: 1.89, y: 1.0223008}
+--- !u!114 &6952589249309316398
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32eeee9864ffaca41bfb18bac17e05d0, type: 3}
+  m_Name: EndNode
+  m_EditorClassIdentifier: 
+  position: {x: 0.0012994995, y: 1.74}

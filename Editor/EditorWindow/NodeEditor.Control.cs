@@ -8,7 +8,9 @@ namespace SugarNode.Editor
     partial class NodeEditorWindow
     {
         private Event control => Event.current;
-        private Vector2 mousePosition = Vector2.zero;
+        private Vector2 mousePosition = Vector2.zero;//缓存记录鼠标位置
+        private bool isDragging = false;//是否正在拖拽鼠标
+        private Vector2 dragStartPos = Vector2.zero;//缓存记录拖拽的起点
         private void ComputeUserControl()
         {
             mousePosition = control.mousePosition;//因为匿名函数的原因所以绕路
@@ -25,7 +27,20 @@ namespace SugarNode.Editor
                 }
                 else if (control.button == 0)//计算鼠标左键点击节点还是端口
                 {
-
+                    switch (control.type)
+                    {
+                        case EventType.MouseDown:
+                            dragStartPos = mousePosition;
+                            break;
+                        case EventType.MouseDrag:
+                            isDragging = true;
+                            break;
+                        case EventType.MouseUp:
+                            isDragging = false;
+                            break;
+                        default: break;
+                    }
+                    control.Use();
                 }
             }
             else if (control.isScrollWheel)

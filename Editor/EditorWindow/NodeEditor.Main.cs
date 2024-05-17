@@ -51,10 +51,12 @@ namespace SugarNode.Editor
         void OnGUI()
         {
             ComputeUserControl();//计算用户的键鼠操作
-            DrawGrid();//绘制网格
+            DrawGrid();//绘制网格            
             DrawNodeGraph();//绘制节点图
-            DrawDragRect();//绘制选择框
-            if(debugMode) DrawDebugInfo();//开发过程Debug专用
+            if(isDragging) 
+                DrawDragRect();
+            if (debugMode)
+                DrawDebugInfo();//开发过程Debug专用
         }
         void OnEnable()
         {

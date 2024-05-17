@@ -5,7 +5,7 @@ namespace SugarNode.Editor
 {
     partial class NodeEditorWindow
     {
-        const float PPI = 0.001f;//其实是每单位像素对应UV坐标的多少单位\
+        const float PPI = 0.005f;//其实是每单位像素对应UV坐标的多少单位\
         const int TitleHeight = 20;
         bool debugMode = false;
         Rect drawGridRect => new Rect(Vector2.zero, position.size);
@@ -133,7 +133,10 @@ namespace SugarNode.Editor
         }
         void DrawDragRect()
         {
-
+            var sourceColor = GUI.color;
+            GUI.color = Color.red;
+            GUI.Box(new Rect(dragStartPos,mousePosition-dragStartPos),"");
+            GUI.color = sourceColor;
         }
         void DrawDebugInfo()
         {

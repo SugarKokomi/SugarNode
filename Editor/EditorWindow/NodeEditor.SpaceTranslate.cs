@@ -18,6 +18,18 @@ namespace SugarNode.Editor
             pos /= ScaleOffset;
             return pos;
         }
+        private Rect TranslateGridToWindowRect(Rect rect)
+        {
+            rect.position = TranslateGridToWindow(rect.position);
+            rect.size = TranslateGridToWindow(rect.size);
+            return rect;
+        }
+        private Rect TranslateWindowToGridRect(Rect rect)
+        {
+            rect.position = TranslateWindowToGrid(rect.position);
+            rect.size = TranslateWindowToGrid(rect.size);
+            return rect;
+        }
         //使用此函数需要确保没有更改GUI.matrix,要不然计算出来是缩放之后的坐标系的UI
         private Vector2 TranslateWindowToGUI(Vector2 pos)
         {

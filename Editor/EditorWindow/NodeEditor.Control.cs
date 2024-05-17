@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using static SugarNode.Editor.NodeEditorSettings;
@@ -54,9 +55,10 @@ namespace SugarNode.Editor
             {
                 if (control.keyCode == KeyCode.F && control.type == EventType.KeyDown)
                 {
-                    if (activeGraph && activeGraph.nodes.Count >= 1)//TODO:看向选择的节点
-                        LookAtNode(activeGraph.nodes[0]);
-                    else LookAtPoint(Vector2.zero);
+                    if (selectionCache.Count >= 1)//TODO:看向选择的节点
+                        LookAtNode(selectionCache.FirstOrDefault());
+                    else
+                        LookAtPoint(Vector2.zero);
                     control.Use();
                 }
                 else if (control.keyCode == KeyCode.Delete)
@@ -80,11 +82,15 @@ namespace SugarNode.Editor
             Vector2 offsetPoint = node.position + new Vector2(x_offset, 0.5f);
             LookAtPoint(offsetPoint);
         }
+        /// <summary> 基于Unity的Project窗口选择的NodeGraph改变时，重新绘制节点图 </summary>
         private void OnSelectionChanged()
         {
             if (Selection.activeObject is NodeGraph nodeGraph)
                 activeGraph = nodeGraph;
         }
+        /// <summary> 将节点添加到激活的节点图中 </summary>
+        /// <param name="newNodeType">节点类型</param>
+        /// <param name="nodePosition">Grid坐标系中的位置</param>
         private void AddNodeToActiveGraph(Type newNodeType, Vector2 nodePosition)
         {
             var newNode = activeGraph.AddNode(newNodeType);
@@ -93,15 +99,26 @@ namespace SugarNode.Editor
             AssetDatabase.SaveAssets();
             Repaint();
         }
+        /// <summary> 删掉一个节点 </summary>
         private void DelectNodeInActiveGraph(Node delectObj)
         {
             activeGraph.RemoveNode(delectObj);//从节点列表移除
             AssetDatabase.RemoveObjectFromAsset(delectObj);//从文件中删除资源
+            AssetDatabase.SaveAssets();
             Destroy(delectObj);//删掉文件
         }
         private Node CopyNode(Node node)
         {
             return default;
+        }
+        private void ComputeSelectNodes()
+        {
+            var seletRect = TranslateWindowToGridRect(new Rect(dragStartPos, mousePosition - dragStartPos));
+            selectionCache = activeGraph.nodes.Where(//在Grid空间下检查框选范围的选择节点
+            node =>
+            {
+                return false;
+            }).ToHashSet();
         }
     }
 }

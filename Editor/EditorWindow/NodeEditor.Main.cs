@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEditor;
 using static SugarNode.Editor.NodeEditorSettings;
+using System.Collections.Generic;
 //using System.Reflection;
 //[assembly: AssemblyVersion("0.1")]
 namespace SugarNode.Editor
@@ -42,6 +43,8 @@ namespace SugarNode.Editor
             get => m_activeGraph;
             set { m_activeGraph = value; Instence.Repaint(); }
         }
+        private HashSet<Node> selectionCache = new HashSet<Node>();
+        //----------------------Function-------------------------------------------------
         [MenuItem("Window/打开SugarNodeEditor窗口")]
         public static void OpenWindow()
         {

@@ -57,7 +57,12 @@ namespace SugarNode.Editor
                 nodeBody = new GUIStyle();
                 nodeBody.normal.background = ResourceLoader.NodeBodyTexture;
                 nodeBody.padding = new RectOffset(3, 3, 3, 3);//别问，问就是在编辑器拉的边框
-                nodeBody.border = new RectOffset(15, 15, 61, 4);
+                nodeBody.border = new RectOffset(20, 20, 64, 10);
+
+                nodeHeight = new GUIStyle();
+                nodeHeight.normal.background = ResourceLoader.NodeHeightTexture;
+                nodeHeight.padding = new RectOffset(0, 0, 0, 0);//别问，问就是在编辑器拉的边框
+                nodeHeight.border = new RectOffset(40, 40, 40, 40);
             }
             public void SetNodeBodyColorOffset(Color color)
             {

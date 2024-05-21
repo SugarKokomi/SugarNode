@@ -12,6 +12,7 @@ namespace SugarNode.Editor
         private Vector2 mousePosition = Vector2.zero;//缓存记录鼠标位置
         private bool isDragging = false;//是否正在拖拽鼠标
         private Vector2 dragStartPos = Vector2.zero;//缓存记录拖拽的起点
+        private Rect selectionRect => new Rect(dragStartPos, mousePosition - dragStartPos);
         private void ComputeUserControl()
         {
             mousePosition = control.mousePosition;//因为匿名函数的原因所以绕路
@@ -35,9 +36,11 @@ namespace SugarNode.Editor
                             break;
                         case EventType.MouseDrag:
                             isDragging = true;
+                            ComputeSelectNodes();
                             break;
                         case EventType.MouseUp:
                             isDragging = false;
+                            ComputeSelectNodes();
                             break;
                         default: break;
                     }
@@ -70,7 +73,7 @@ namespace SugarNode.Editor
         /// <summary> 在网格坐标系中，看向某个位置 </summary>
         private void LookAtPoint(Vector2 pos)
         {
-            var windowPos = TranslateGridToWindow(pos);//转换到窗口空间
+            var windowPos = TranslateGridToScreen(pos);//转换到窗口空间
             windowPos = position.size / 2 - windowPos;//得到窗口空间下，目标点指向窗口中心的向量
             PositionOffset += windowPos * ScaleOffset;//将缩放后的偏移向量加在坐标偏移向量里
         }
@@ -88,6 +91,7 @@ namespace SugarNode.Editor
             if (Selection.activeObject is NodeGraph nodeGraph)
                 activeGraph = nodeGraph;
         }
+        #region 资源操作
         /// <summary> 将节点添加到激活的节点图中 </summary>
         /// <param name="newNodeType">节点类型</param>
         /// <param name="nodePosition">Grid坐标系中的位置</param>
@@ -111,14 +115,13 @@ namespace SugarNode.Editor
         {
             return default;
         }
+        #endregion
         private void ComputeSelectNodes()
         {
-            var seletRect = TranslateWindowToGridRect(new Rect(dragStartPos, mousePosition - dragStartPos));
-            selectionCache = activeGraph.nodes.Where(//在Grid空间下检查框选范围的选择节点
-            node =>
-            {
-                return false;
-            }).ToHashSet();
+            var seletRect = TranslateScreenToGridRect(selectionRect);
+            selectionCache = activeGraph.nodes.Where(
+                node =>seletRect.Overlaps(node.GetNodeRectInGridSpace()))//在Grid空间下检查框选范围的选择节点
+                .ToHashSet();
         }
     }
 }

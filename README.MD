@@ -1,6 +1,6 @@
 # SugarNode 节点编辑器
 
-**<font color="red"><font size = 7>本插件尚未开发完成！尚不能投入使用！</font></font>**
+**本插件尚未开发完成！尚不能投入使用！**
 
 完整项目已经开源到了Github->[SugarNode](https://github.com/SugarKokomi/SugarNode)，如果你花钱买了，说明你被坑了。
 

@@ -59,11 +59,11 @@ namespace SugarNode.Editor
                         if (childClass.GetCustomAttribute(typeof(CreateMenuAttribute)) is CreateMenuAttribute createMenu)//有这个Attribute，就创建在用户的自定义路径
                             menu.AddItem(new GUIContent(createMenu.menuPath),
                             false,
-                            () => AddNodeToActiveGraph(childClass, TranslateWindowToGrid(mousePosition)));
+                            () => AddNodeToActiveGraph(childClass, TranslateScreenToGrid(mousePosition)));
                         else
                             menu.AddItem(new GUIContent(childClass.Name),
                             false,
-                            () => AddNodeToActiveGraph(childClass, TranslateWindowToGrid(mousePosition)));
+                            () => AddNodeToActiveGraph(childClass, TranslateScreenToGrid(mousePosition)));
                     }
                 }
             }
@@ -72,7 +72,7 @@ namespace SugarNode.Editor
                 PositionOffset = Vector2.zero;
                 ScaleOffset = 5;
             });
-            menu.AddItem(new GUIContent(debugMode ? "退出Debug模式" : "进入Debug模式"), false, () => debugMode = !debugMode);
+            menu.AddItem(new GUIContent("Debug模式"), debugMode, () => debugMode = !debugMode);
             menu.ShowAsContext();
         }
         //绘制节点图
@@ -110,19 +110,20 @@ namespace SugarNode.Editor
         void DrawNode(Node node)
         {
             //获取节点的Attribute缓存信息，在绘制本节点的时候应用上
-            uint nodeWidth = node.GetNodeWidth();
             NodeColorAttribute colorAttri = node.GetAttributeCache<NodeColorAttribute>();
-            //转换空间坐标
-            Vector2 windowPos = TranslateGridToWindow(node.position);
-            windowPos = TranslateWindowToGUI(windowPos);
             //绘制节点
-            Rect scaleWindowRect = new Rect(windowPos, new Vector2(nodeWidth, 500));
+            Rect scaleWindowRect = TranslateGridToGUIRect(node.GetNodeRectInGridSpace());
+            scaleWindowRect.height += 64;//上个函数计算的仅仅是内容的Height
             GUILayout.BeginArea(scaleWindowRect);//这个玩意儿不需要加这个括号->  {},仅仅是方便查看
             {
-                if (colorAttri != null)
-                    ResourceLoader.NodeGUIStyle.SetNodeBodyColorOffset(colorAttri.color);
+                /* if (colorAttri != null)
+                    ResourceLoader.NodeGUIStyle.SetNodeBodyColorOffset(colorAttri.color); */
+                if(selectionCache.Contains(node))
+                    GUILayout.BeginVertical(ResourceLoader.NodeGUIStyle.nodeHeight, GUILayout.Width(scaleWindowRect.width));
                 GUILayout.BeginVertical(ResourceLoader.NodeGUIStyle.nodeBody, GUILayout.Width(scaleWindowRect.width));
                 GUILayout.Space(scaleWindowRect.height);//TODO:在此处绘制节点的所有字段等玩意儿
+                if(selectionCache.Contains(node))
+                    GUILayout.EndVertical();
                 GUILayout.EndVertical();
             }
             GUILayout.EndArea();
@@ -133,10 +134,7 @@ namespace SugarNode.Editor
         }
         void DrawDragRect()
         {
-            var sourceColor = GUI.color;
-            GUI.color = Color.red;
-            GUI.Box(new Rect(dragStartPos,mousePosition-dragStartPos),"");
-            GUI.color = sourceColor;
+            GUI.Box(selectionRect,"");
         }
         void DrawDebugInfo()
         {
@@ -144,7 +142,7 @@ namespace SugarNode.Editor
             {
                 GUI.color = Color.white;
                 GUILayout.Label($"鼠标位置：{mousePosition}");
-                GUILayout.Label($"鼠标所在网格位置：{TranslateWindowToGrid(mousePosition)}");
+                GUILayout.Label($"鼠标所在网格位置：{TranslateScreenToGrid(mousePosition)}");
                 GUILayout.Label($"鼠标距离网格中心的偏移位置：{PositionOffset - mousePosition * ScaleOffset}");
                 GUILayout.Label($"网格偏移：{PositionOffset}");
                 GUILayout.Label($"网格缩放：{ScaleOffset}");

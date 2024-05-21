@@ -2,6 +2,7 @@ using System;
 using System.Reflection;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 namespace SugarNode
 {
@@ -77,10 +78,31 @@ namespace SugarNode
                 return newAttribute2 as T;
             }
         }
+        //------------------------------------------------------
         internal uint GetNodeWidth()
         {
             var attribute = GetAttributeCache<NodeWidthAttribute>();
             return attribute?.width ?? 1000;
+        }
+        static Dictionary<Type, FieldInfo[]> fieldInfoCache = new Dictionary<Type, FieldInfo[]>();
+        internal FieldInfo[] GetShowFieldsCache()
+        {
+            Type type = this.GetType();
+            if (!fieldInfoCache.TryGetValue(type, out var ret))
+            {
+                var fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public);//获取所有可实例化和公共字段
+                ret = fields.Where(x => !x.IsStatic && x.GetType().IsSerializable).ToArray();
+                fieldInfoCache.Add(type,ret);
+            }
+            return ret;
+        }
+        /// <summary> 获取Node的网格空间所在的Rect </summary>
+        internal Rect GetNodeRectInGridSpace()
+        {
+            var attribute = GetAttributeCache<NodeWidthAttribute>();
+            var width = attribute?.width ?? 3;
+            var height = GetShowFieldsCache().Length * 0.2f;//姑且先定义一个字段为0.2格
+            return new Rect(position,new Vector2(width,height));
         }
 #endif
         #endregion

@@ -148,7 +148,6 @@ namespace SugarNode.Editor
                 GUILayout.Label($"网格缩放：{ScaleOffset}");
             }
             GUILayout.EndArea();
-            //Repaint();//不要不经过任何操作直接在OnGUI里Repaint(),约等于写死循环
         }
     }
 }

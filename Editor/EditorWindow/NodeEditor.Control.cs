@@ -118,6 +118,7 @@ namespace SugarNode.Editor
         #endregion
         private void ComputeSelectNodes()
         {
+            if(!activeGraph || activeGraph.nodes == null) return;
             var seletRect = TranslateScreenToGridRect(selectionRect);
             selectionCache = activeGraph.nodes.Where(
                 node =>seletRect.Overlaps(node.GetNodeRectInGridSpace()))//在Grid空间下检查框选范围的选择节点

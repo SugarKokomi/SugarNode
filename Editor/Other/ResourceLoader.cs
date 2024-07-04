@@ -85,6 +85,10 @@ namespace SugarNode.Editor
                 }
                 source.Apply(); */
             }
+            void OnEnable()
+            {
+                ComputeGridTexture2D();
+            }
         }
     }
 }

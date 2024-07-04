@@ -54,7 +54,7 @@ namespace SugarNode.Editor
             }
         }
         private const string SettingFolderPath = "Assets/Settings";
-        private const string SettingFilePath = SettingFolderPath + "/NodeEditorSetting.asset";
+        private const string SettingFilePath = SettingFolderPath + "/SugarNodeSetting.asset";
         private static NodeEditorSettings m_Setting;
         public static NodeEditorSettings Setting
         {
@@ -67,7 +67,6 @@ namespace SugarNode.Editor
                     if (m_Setting == null)
                     {
                         m_Setting = CreateInstance<NodeEditorSettings>();
-                        m_Setting.backGroundColor = Color.white;
                         if (!Directory.Exists(SettingFolderPath))
                             Directory.CreateDirectory(SettingFolderPath);
                         AssetDatabase.CreateAsset(m_Setting, SettingFilePath);

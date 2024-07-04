@@ -12,11 +12,12 @@ namespace SugarNode
     {
         [SerializeField]
         internal Vector2 position = Vector2.zero;
-        public HashSet<InputPort> Inputs { get; private set; } = new HashSet<InputPort>();
-        public HashSet<OutputPort> Outputs { get; private set; } = new HashSet<OutputPort>();
+        public readonly HashSet<InputPort> Inputs  = new HashSet<InputPort>();
+        public readonly HashSet<OutputPort> Outputs  = new HashSet<OutputPort>();
         public NodeGraph Owner { get; internal set; }
         public virtual object GetPortValue(NodePort nodePort) => default;
         public virtual T GetOutputValue<T>(OutputPort<T> outputPort) => outputPort.value;
+        internal const uint DefaultNodeWidth = 2;
         //----------------------------------------------------------------
         public Node()
         {
@@ -83,7 +84,7 @@ namespace SugarNode
         internal uint GetNodeWidth()
         {
             var attribute = GetAttributeCache<NodeWidthAttribute>();
-            return attribute?.width ?? 1000;
+            return attribute?.width ?? DefaultNodeWidth;
         }
         static Dictionary<Type, FieldInfo[]> fieldInfoCache = new Dictionary<Type, FieldInfo[]>();
         internal FieldInfo[] GetShowFieldsCache()
@@ -101,8 +102,8 @@ namespace SugarNode
         internal Rect GetNodeRectInGridSpace()
         {
             var attribute = GetAttributeCache<NodeWidthAttribute>();
-            var width = attribute?.width ?? 3;
-            var height = GetShowFieldsCache().Length * 0.2f;//姑且先定义一个字段为0.2格
+            var width = attribute?.width ?? DefaultNodeWidth;
+            var height = GetShowFieldsCache().Length * 0.3f;//姑且先定义一个字段为0.2格
             return new Rect(position,new Vector2(width,height));
         }
 #endif

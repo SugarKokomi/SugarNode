@@ -56,7 +56,7 @@ namespace SugarNode.Editor
             ComputeUserControl();//计算用户的键鼠操作
             DrawGrid();//绘制网格            
             DrawNodeGraph();//绘制节点图
-            if(isDragging) 
+            if(isDragging && !isDraggingNode) 
                 DrawDragRect();
             if (debugMode)
                 DrawDebugInfo();//开发过程Debug专用

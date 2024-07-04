@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using static SugarNode.Editor.NodeEditorSettings;
@@ -11,8 +12,10 @@ namespace SugarNode.Editor
         private Event control => Event.current;
         private Vector2 mousePosition = Vector2.zero;//缓存记录鼠标位置
         private bool isDragging = false;//是否正在拖拽鼠标
+        private bool isDraggingNode = false;//是否正在拖拽节点
         private Vector2 dragStartPos = Vector2.zero;//缓存记录拖拽的起点
         private Rect selectionRect => new Rect(dragStartPos, mousePosition - dragStartPos);
+        private Dictionary<Node,Vector2> nodePosCache;//拖拽开始时，节点所在位置的缓存
         private void ComputeUserControl()
         {
             mousePosition = control.mousePosition;//因为匿名函数的原因所以绕路
@@ -29,20 +32,33 @@ namespace SugarNode.Editor
                 }
                 else if (control.button == 0)//计算鼠标左键点击节点还是端口
                 {
-                    switch (control.type)
+                    if (control.type is EventType.MouseDown)//拖拽开始
                     {
-                        case EventType.MouseDown:
-                            dragStartPos = mousePosition;
-                            break;
-                        case EventType.MouseDrag:
-                            isDragging = true;
-                            ComputeSelectNodes();
-                            break;
-                        case EventType.MouseUp:
-                            isDragging = false;
-                            ComputeSelectNodes();
-                            break;
-                        default: break;
+                        dragStartPos = mousePosition;
+                        isDragging = true;
+                        if (selectionCache.Any(//如果玩家在某个节点身上按下，就是拖拽节点
+                                x => x.GetNodeRectInGridSpace()
+                                .Contains(TranslateScreenToGrid(mousePosition))))
+                        {
+                            isDraggingNode = true;
+                            nodePosCache = new Dictionary<Node, Vector2>();
+                            foreach(var item in selectionCache)
+                            {
+                                nodePosCache.Add(item,item.position);
+                            }
+                        }
+                        else selectionCache = new HashSet<Node>();
+                    }
+                    else if (control.type is EventType.MouseUp)//拖拽结束
+                    {
+                        isDragging = false;
+                        isDraggingNode = false;
+                        nodePosCache = null;
+                    }
+                    else if (control.type is EventType.MouseDrag)//拖拽过程
+                    {
+                        if (isDraggingNode) SelectNodeFollowMouse();
+                        else ComputeSelectNodes();
                     }
                     control.Use();
                 }
@@ -56,17 +72,23 @@ namespace SugarNode.Editor
             }
             else if (control.isKey)
             {
-                if (control.keyCode == KeyCode.F && control.type == EventType.KeyDown)
+                if (control.type == EventType.KeyDown && control.keyCode == KeyCode.F)
                 {
                     if (selectionCache.Count >= 1)//TODO:看向选择的节点
                         LookAtNode(selectionCache.FirstOrDefault());
+                    else if(Selection.activeObject is Node node)
+                        LookAtNode(node);
                     else
                         LookAtPoint(Vector2.zero);
                     control.Use();
                 }
                 else if (control.keyCode == KeyCode.Delete)
                 {
-                    //TODO:检查选择缓存，删除选择的节点
+                    foreach(var node in selectionCache)
+                    {
+                        DelectNodeInActiveGraph(node);
+                    }
+                    selectionCache = new HashSet<Node>();
                 }
             }
         }
@@ -108,21 +130,32 @@ namespace SugarNode.Editor
         {
             activeGraph.RemoveNode(delectObj);//从节点列表移除
             AssetDatabase.RemoveObjectFromAsset(delectObj);//从文件中删除资源
+            DestroyImmediate(delectObj);//删掉文件
             AssetDatabase.SaveAssets();
-            Destroy(delectObj);//删掉文件
+            Repaint();
         }
         private Node CopyNode(Node node)
-        {
+        {//TODO:在视窗中复制一个Node（真实复制逻辑写在Node里）
             return default;
         }
         #endregion
+        /// <summary> 计算选择了哪些节点 </summary>
         private void ComputeSelectNodes()
         {
-            if(!activeGraph || activeGraph.nodes == null) return;
+            if (!activeGraph || activeGraph.nodes == null) return;
             var seletRect = TranslateScreenToGridRect(selectionRect);
             selectionCache = activeGraph.nodes.Where(
-                node =>seletRect.Overlaps(node.GetNodeRectInGridSpace()))//在Grid空间下检查框选范围的选择节点
+                node => seletRect.Overlaps(node.GetNodeRectInGridSpace(), true))//在Grid空间下检查框选范围的选择节点
                 .ToHashSet();
+        }
+        /// <summary> 让节点被鼠标拖拽 </summary>
+        private void SelectNodeFollowMouse()
+        {
+            var mouseMove = TranslateScreenToGrid(mousePosition) - TranslateScreenToGrid(dragStartPos);
+            foreach (var node in selectionCache)
+            {
+                node.position = nodePosCache[node] + mouseMove;
+            }
         }
     }
 }

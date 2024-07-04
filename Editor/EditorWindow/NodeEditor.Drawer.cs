@@ -110,10 +110,9 @@ namespace SugarNode.Editor
         void DrawNode(Node node)
         {
             //获取节点的Attribute缓存信息，在绘制本节点的时候应用上
-            NodeColorAttribute colorAttri = node.GetAttributeCache<NodeColorAttribute>();
+            //NodeColorAttribute colorAttri = node.GetAttributeCache<NodeColorAttribute>();
             //绘制节点
             Rect scaleWindowRect = TranslateGridToGUIRect(node.GetNodeRectInGridSpace());
-            scaleWindowRect.height += 64;//上个函数计算的仅仅是内容的Height
             GUILayout.BeginArea(scaleWindowRect);//这个玩意儿不需要加这个括号->  {},仅仅是方便查看
             {
                 /* if (colorAttri != null)
@@ -141,9 +140,9 @@ namespace SugarNode.Editor
             GUILayout.BeginArea(new Rect(control.mousePosition, new Vector2(500, 200)));
             {
                 GUI.color = Color.white;
-                GUILayout.Label($"鼠标位置：{mousePosition}");
-                GUILayout.Label($"鼠标所在网格位置：{TranslateScreenToGrid(mousePosition)}");
-                GUILayout.Label($"鼠标距离网格中心的偏移位置：{PositionOffset - mousePosition * ScaleOffset}");
+                GUILayout.Label($"鼠标位置(屏幕坐标)：{mousePosition}");
+                GUILayout.Label($"鼠标位置(网格坐标)：{TranslateScreenToGrid(mousePosition)}");
+                GUILayout.Label($"鼠标与网格原点偏移：{PositionOffset - mousePosition * ScaleOffset}");
                 GUILayout.Label($"网格偏移：{PositionOffset}");
                 GUILayout.Label($"网格缩放：{ScaleOffset}");
             }

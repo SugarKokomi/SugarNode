@@ -7,5 +7,7 @@ namespace SugarNode.Example
     {
         public InputPort input = new InputPort();
         public OutputPort<string> output = new OutputPort<string>(string.Empty);
+        public int id;
+        public string text = "hello world";
     }
 }

@@ -4,6 +4,8 @@ using System.Reflection;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using UnityEditor;
+using UnityEditor.Graphs;
 
 namespace SugarNode
 {
@@ -12,8 +14,8 @@ namespace SugarNode
     {
         [SerializeField]
         internal Vector2 position = Vector2.zero;
-        public readonly HashSet<InputPort> Inputs  = new HashSet<InputPort>();
-        public readonly HashSet<OutputPort> Outputs  = new HashSet<OutputPort>();
+        public readonly HashSet<InputPort> Inputs = new HashSet<InputPort>();
+        public readonly HashSet<OutputPort> Outputs = new HashSet<OutputPort>();
         public NodeGraph Owner { get; internal set; }
         public virtual object GetPortValue(NodePort nodePort) => default;
         public virtual T GetOutputValue<T>(OutputPort<T> outputPort) => outputPort.value;
@@ -59,6 +61,17 @@ namespace SugarNode
                 }
             }
         }
+        public virtual void OnNodeEditorGUI()
+        {
+            SerializedObject serializedObject = new SerializedObject(this);
+            SerializedProperty property = serializedObject.GetIterator();
+            bool enterChild = true;
+            while (property.NextVisible(enterChild))
+            {
+                EditorGUILayout.PropertyField(property);
+                enterChild = false;
+            }
+        }
         #region Internal And EditorOnly
 #if UNITY_EDITOR
         //避免使用Reflection在OnGUI每帧获取，节约性能，写缓存记录该节点的Attribute信息
@@ -81,6 +94,11 @@ namespace SugarNode
             }
         }
         //------------------------------------------------------
+        internal string GetNodeTitle()
+        {
+            var attribute = GetAttributeCache<NodeTitleAttribute>();
+            return attribute?.name ?? this.GetType().Name;
+        }
         internal uint GetNodeWidth()
         {
             var attribute = GetAttributeCache<NodeWidthAttribute>();
@@ -94,7 +112,7 @@ namespace SugarNode
             {
                 var fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public);//获取所有可实例化和公共字段
                 ret = fields.Where(x => !x.IsStatic && x.GetType().IsSerializable).ToArray();
-                fieldInfoCache.Add(type,ret);
+                fieldInfoCache.Add(type, ret);
             }
             return ret;
         }
@@ -104,7 +122,7 @@ namespace SugarNode
             var attribute = GetAttributeCache<NodeWidthAttribute>();
             var width = attribute?.width ?? DefaultNodeWidth;
             var height = GetShowFieldsCache().Length * 0.3f;//姑且先定义一个字段为0.2格
-            return new Rect(position,new Vector2(width,height));
+            return new Rect(position, new Vector2(width, height));
         }
 #endif
         #endregion

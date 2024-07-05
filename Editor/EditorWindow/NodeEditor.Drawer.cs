@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEditor;
-using System.Reflection;
+//using System.Reflection;
 namespace SugarNode.Editor
 {
     partial class NodeEditorWindow
@@ -56,21 +56,16 @@ namespace SugarNode.Editor
                     var childClasses = GetSubclasses(parentClass);
                     foreach (var childClass in childClasses)//对于每个具体能实例化的类
                     {
-                        if (childClass.GetCustomAttribute(typeof(CreateMenuAttribute)) is CreateMenuAttribute createMenu)//有这个Attribute，就创建在用户的自定义路径
-                            menu.AddItem(new GUIContent(createMenu.menuPath),
-                            false,
-                            () => AddNodeToActiveGraph(childClass, TranslateScreenToGrid(mousePosition)));
-                        else
-                            menu.AddItem(new GUIContent(childClass.Name),
-                            false,
-                            () => AddNodeToActiveGraph(childClass, TranslateScreenToGrid(mousePosition)));
+                        menu.AddItem(new GUIContent(GetRightMenuPath(childClass)),
+                        false,
+                        () => AddNodeToActiveGraph(childClass, TranslateScreenToGrid(mousePosition)));
                     }
                 }
             }
             menu.AddItem(new GUIContent($"复位移动和缩放"), false, () =>
             {
                 PositionOffset = Vector2.zero;
-                ScaleOffset = 5;
+                ScaleOffset = 2;
             });
             menu.AddItem(new GUIContent("Debug模式"), debugMode, () => debugMode = !debugMode);
             menu.ShowAsContext();
@@ -109,23 +104,23 @@ namespace SugarNode.Editor
         }
         void DrawNode(Node node)
         {
-            //获取节点的Attribute缓存信息，在绘制本节点的时候应用上
-            //NodeColorAttribute colorAttri = node.GetAttributeCache<NodeColorAttribute>();
-            //绘制节点
-            Rect scaleWindowRect = TranslateGridToGUIRect(node.GetNodeRectInGridSpace());
-            GUILayout.BeginArea(scaleWindowRect);//这个玩意儿不需要加这个括号->  {},仅仅是方便查看
-            {
-                /* if (colorAttri != null)
-                    ResourceLoader.NodeGUIStyle.SetNodeBodyColorOffset(colorAttri.color); */
-                if(selectionCache.Contains(node))
-                    GUILayout.BeginVertical(ResourceLoader.NodeGUIStyle.nodeHeight, GUILayout.Width(scaleWindowRect.width));
-                GUILayout.BeginVertical(ResourceLoader.NodeGUIStyle.nodeBody, GUILayout.Width(scaleWindowRect.width));
-                GUILayout.Space(scaleWindowRect.height);//TODO:在此处绘制节点的所有字段等玩意儿
-                if(selectionCache.Contains(node))
+            Rect nodeGUIRect = TranslateGridToGUIRect(node.GetNodeRectInGridSpace());//获取节点在网格空间的Rect，并转换到GUI坐标系下
+
+            bool thisNodewasSelected = selectionCache.Contains(node);
+            if (thisNodewasSelected)//如果被选择了，还需要绘制选择框
+                GUILayout.BeginVertical(ResourceLoader.NodeGUIStyle.nodeHeight, GUILayout.Width(nodeGUIRect.width));
+            {//绘制节点本体
+                GUILayout.BeginArea(nodeGUIRect);//这个玩意儿不需要加这个括号->  {},仅仅是方便查看
+                {
+                    GUILayout.BeginVertical(ResourceLoader.NodeGUIStyle.nodeBody, GUILayout.Width(nodeGUIRect.width));//绘制节点背景
+                    EditorGUILayout.LabelField(node.GetNodeTitle());
+                    node.OnNodeEditorGUI();//绘制节点的数据部分
                     GUILayout.EndVertical();
-                GUILayout.EndVertical();
+                }
+                GUILayout.EndArea();
             }
-            GUILayout.EndArea();
+            if (thisNodewasSelected) GUILayout.EndVertical();
+
         }
         void DrawPortLine(NodePort output, NodePort input)
         {
@@ -133,7 +128,7 @@ namespace SugarNode.Editor
         }
         void DrawDragRect()
         {
-            GUI.Box(selectionRect,"");
+            GUI.Box(selectionRect, "");
         }
         void DrawDebugInfo()
         {

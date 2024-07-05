@@ -54,13 +54,15 @@ namespace SugarNode.Editor
                         isDragging = false;
                         isDraggingNode = false;
                         nodePosCache = null;
+                        control.Use();
                     }
                     else if (control.type is EventType.MouseDrag)//拖拽过程
                     {
                         if (isDraggingNode) SelectNodeFollowMouse();
                         else ComputeSelectNodes();
+                        control.Use();
                     }
-                    control.Use();
+                    
                 }
             }
             else if (control.isScrollWheel)
@@ -102,7 +104,7 @@ namespace SugarNode.Editor
         /// <summary> 看向一个Node </summary>
         private void LookAtNode(Node node)
         {
-            uint x_offset_GUI = node.GetNodeWidth();//GUI坐标系中的宽度
+            uint x_offset_GUI = node.GetNodeWidthInGridSpace();//GUI坐标系中的宽度
             float x_offset = PPI * x_offset_GUI / 2;//网格坐标系中，偏移节点宽度的一半（高度姑且先偏移网格的0.5格）
             Vector2 offsetPoint = node.position + new Vector2(x_offset, 0.5f);
             LookAtPoint(offsetPoint);

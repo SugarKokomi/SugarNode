@@ -6,6 +6,7 @@ using UnityEngine;
 using System.Linq;
 using UnityEditor;
 using UnityEditor.Graphs;
+using SugarNode.Editor;
 
 namespace SugarNode
 {
@@ -65,12 +66,15 @@ namespace SugarNode
         {
             SerializedObject serializedObject = new SerializedObject(this);
             SerializedProperty property = serializedObject.GetIterator();
+            serializedObject.Update();
             bool enterChild = true;
             while (property.NextVisible(enterChild))
             {
-                EditorGUILayout.PropertyField(property);
                 enterChild = false;
+                if (property.name == "position" || property.name == "m_Script") continue;
+                EditorGUILayout.PropertyField(property);
             }
+            serializedObject.ApplyModifiedProperties();
         }
         #region Internal And EditorOnly
 #if UNITY_EDITOR
@@ -97,31 +101,45 @@ namespace SugarNode
         internal string GetNodeTitle()
         {
             var attribute = GetAttributeCache<NodeTitleAttribute>();
-            return attribute?.name ?? this.GetType().Name;
+            if (attribute != null)//有Attribute，则返回自定义的Attribute的name
+                return attribute.name;
+            else//没有Attribute就看是不是Node结尾的类名，是就去掉Node四个字母返回
+            {
+                string typeName = this.GetType().Name;
+                if (typeName.ToLower().EndsWith("node"))
+                    return typeName[..(typeName.Length - 4)];
+                else return typeName;
+            }
         }
-        internal uint GetNodeWidth()
+        internal uint GetNodeWidthInGridSpace()
         {
             var attribute = GetAttributeCache<NodeWidthAttribute>();
             return attribute?.width ?? DefaultNodeWidth;
         }
-        static Dictionary<Type, FieldInfo[]> fieldInfoCache = new Dictionary<Type, FieldInfo[]>();
-        internal FieldInfo[] GetShowFieldsCache()
+        static Dictionary<Type, float> nodeHightCache = new Dictionary<Type, float>();
+        internal float GetNodeHeightInGridSpace()
         {
             Type type = this.GetType();
-            if (!fieldInfoCache.TryGetValue(type, out var ret))
+            if (nodeHightCache.TryGetValue(type, out var ret))
+                return ret;
+            else
             {
-                var fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public);//获取所有可实例化和公共字段
-                ret = fields.Where(x => !x.IsStatic && x.GetType().IsSerializable).ToArray();
-                fieldInfoCache.Add(type, ret);
+                SerializedObject serializedObject = new SerializedObject(this);
+                var serializedProperty = serializedObject.GetIterator();
+                ret = 0;
+                while (serializedProperty.NextVisible(true))
+                {
+                    ret++;
+                }
+                ret = .5f + .1f * ret;//TODO:此处有问题，需要把字段数量和图片72像素的尺寸转换到网格空间
+                nodeHightCache.Add(type, ret);
+                return nodeHightCache[type];
             }
-            return ret;
         }
-        /// <summary> 获取Node的网格空间所在的Rect </summary>
         internal Rect GetNodeRectInGridSpace()
         {
-            var attribute = GetAttributeCache<NodeWidthAttribute>();
-            var width = attribute?.width ?? DefaultNodeWidth;
-            var height = GetShowFieldsCache().Length * 0.3f;//姑且先定义一个字段为0.2格
+            var width = GetNodeWidthInGridSpace();
+            var height = GetNodeHeightInGridSpace();
             return new Rect(position, new Vector2(width, height));
         }
 #endif

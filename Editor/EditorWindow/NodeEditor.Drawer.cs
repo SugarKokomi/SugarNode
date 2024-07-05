@@ -62,6 +62,7 @@ namespace SugarNode.Editor
                     }
                 }
             }
+            menu.AddSeparator("");
             menu.AddItem(new GUIContent($"复位移动和缩放"), false, () =>
             {
                 PositionOffset = Vector2.zero;
@@ -105,21 +106,31 @@ namespace SugarNode.Editor
         void DrawNode(Node node)
         {
             Rect nodeGUIRect = TranslateGridToGUIRect(node.GetNodeRectInGridSpace());//获取节点在网格空间的Rect，并转换到GUI坐标系下
-
             bool thisNodewasSelected = selectionCache.Contains(node);
-            if (thisNodewasSelected)//如果被选择了，还需要绘制选择框
-                GUILayout.BeginVertical(ResourceLoader.NodeGUIStyle.nodeHeight, GUILayout.Width(nodeGUIRect.width));
-            {//绘制节点本体
-                GUILayout.BeginArea(nodeGUIRect);//这个玩意儿不需要加这个括号->  {},仅仅是方便查看
+            //绘制节点本体
+            GUILayout.BeginArea(nodeGUIRect);//这个玩意儿不需要加这个括号->  {},仅仅是方便查看
+            {
+                if (thisNodewasSelected)//如果被选择了，还需要绘制选择框
+                    GUILayout.BeginVertical(ResourceLoader.NodeGUIStyle.nodeHeight, GUILayout.Width(nodeGUIRect.width));
                 {
                     GUILayout.BeginVertical(ResourceLoader.NodeGUIStyle.nodeBody, GUILayout.Width(nodeGUIRect.width));//绘制节点背景
-                    EditorGUILayout.LabelField(node.GetNodeTitle());
+                    GUILayout.Label(node.GetNodeTitle(), ResourceLoader.NodeGUIStyle.title, GUILayout.Height(65));//绘制节点Title
+                    
+                    GUILayout.Space(20);
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Space(20);
+                    GUILayout.BeginVertical();
                     node.OnNodeEditorGUI();//绘制节点的数据部分
                     GUILayout.EndVertical();
+                    GUILayout.Space(20);
+                    GUILayout.EndHorizontal();
+                    GUILayout.Space(20);
+
+                    GUILayout.EndVertical();
                 }
-                GUILayout.EndArea();
+                if (thisNodewasSelected) GUILayout.EndVertical();
             }
-            if (thisNodewasSelected) GUILayout.EndVertical();
+            GUILayout.EndArea();
 
         }
         void DrawPortLine(NodePort output, NodePort input)

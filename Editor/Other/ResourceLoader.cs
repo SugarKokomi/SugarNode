@@ -52,6 +52,7 @@ namespace SugarNode.Editor
         internal class NodeStyle
         {
             public GUIStyle nodeBody, nodeHeight, nodeTitle, nodePort;
+            public GUIStyle title;
             public NodeStyle()
             {
                 nodeBody = new GUIStyle();
@@ -63,6 +64,12 @@ namespace SugarNode.Editor
                 nodeHeight.normal.background = ResourceLoader.NodeHeightTexture;
                 nodeHeight.padding = new RectOffset(0, 0, 0, 0);//别问，问就是在编辑器拉的边框
                 nodeHeight.border = new RectOffset(40, 40, 22, 22);
+
+                title = new GUIStyle();
+                title.normal.textColor = Color.black;
+                title.alignment = TextAnchor.MiddleCenter;
+                title.fontSize = 30;
+                title.fontStyle = FontStyle.Bold;
             }
             public void SetNodeBodyColorOffset(Color color)
             {

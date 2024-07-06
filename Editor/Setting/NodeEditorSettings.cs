@@ -23,7 +23,7 @@ namespace SugarNode.Editor
             set
             {
                 crossColor = value;
-                UpdateNodeEditorGUI(this);
+                UpdateNodeEditorGUI();
             }
         }
         public Color FrontColor
@@ -32,7 +32,7 @@ namespace SugarNode.Editor
             set
             {
                 frontGroundColor = value;
-                UpdateNodeEditorGUI(this);
+                UpdateNodeEditorGUI();
             }
         }
         public Color BackColor
@@ -41,7 +41,7 @@ namespace SugarNode.Editor
             set
             {
                 backGroundColor = value;
-                UpdateNodeEditorGUI(this);
+                UpdateNodeEditorGUI();
             }
         }
         public int GridSize
@@ -50,7 +50,7 @@ namespace SugarNode.Editor
             set
             {
                 gridSize = value;
-                UpdateNodeEditorGUI(this);
+                UpdateNodeEditorGUI();
             }
         }
         private const string SettingFolderPath = "Assets/Settings";
@@ -79,7 +79,7 @@ namespace SugarNode.Editor
         public void Reset()
         {
             SetDefaultValue();
-            ResourceLoader.ComputeGridTexture2D();
+            //ResourceLoader.ComputeGridTexture2D();
             NodeEditorWindow.Instence.Repaint();
         }
         private void SetDefaultValue()
@@ -93,7 +93,7 @@ namespace SugarNode.Editor
             moveSpeed = 1;
             scaleSpeed = 0.5f;
         }
-        public static void UpdateNodeEditorGUI(NodeEditorSettings self)
+        public static void UpdateNodeEditorGUI()
         {
             ResourceLoader.ComputeGridTexture2D();
             NodeEditorWindow.Instence.Repaint();
